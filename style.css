@@ -1,0 +1,257 @@
+:root {
+    --bg: #121212;
+    --sidebar: #1e1e1e;
+    --card: #1b1b1b;
+    --accent: #4a90e2;
+    --accent-hover: #5aa0f2;
+    --danger: #e74c3c;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --radius: 10px;
+    --shadow: 0 4px 12px rgba(0,0,0,0.6);
+  }
+  
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+  }
+  
+  .app {
+    display: flex;
+    width: 100%;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 270px;
+    background: var(--sidebar);
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar h1 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+    text-align: center;
+  }
+  
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .controls input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #333;
+    border-radius: var(--radius);
+    background: #2a2a2a;
+    color: var(--text);
+  }
+  
+  .controls input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .controls button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  .controls button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  /* List of Terms */
+  #terms {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent) #1e1e1e;
+  }
+  
+  #terms li {
+    padding: 0.6rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text);
+    transition: background 0.2s ease;
+  }
+  #terms li:hover {
+    background: #2a2a2a;
+  }
+  #terms li.active {
+    background: var(--accent);
+    color: white;
+  }
+  
+  /* Delete button */
+  .delete-btn {
+    background: var(--danger);
+    border: none;
+    color: white;
+    border-radius: var(--radius);
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+  .delete-btn:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+  
+  /* Main Flashcard Area */
+  .main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .card {
+    background: var(--card);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 550px;
+    width: 100%;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .term {
+    font-size: 1.7rem;
+    font-weight: bold;
+    color: var(--accent);
+  }
+  
+  .definition {
+    display: none;
+    margin-top: 1.2rem;
+    font-size: 1.1rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  
+  .card.revealed .definition {
+    display: block;
+  }
+  
+  .card.revealed .term {
+    margin-bottom: 1rem;
+  }
+  
+  button#revealBtn {
+    margin-top: 1.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+  button#revealBtn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  /* Modal */
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+  }
+  
+  .modal.hidden {
+    display: none;
+  }
+  
+  .modal-content {
+    background: #1e1e1e;
+    padding: 1rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  
+  .modal-content h2 {
+    margin: 0 0 0.5rem;
+    color: var(--accent);
+  }
+  
+  .modal-content textarea,
+  .modal-content input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #333;
+    border-radius: var(--radius);
+    background: #2a2a2a;
+    color: var(--text);
+    font-family: inherit;
+  }
+  
+  .modal-content textarea::placeholder,
+  .modal-content input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .modal-actions button {
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+  }
+  
+  #jsonArea {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: #151515;
+    border: 1px solid #333;
+  }
+  

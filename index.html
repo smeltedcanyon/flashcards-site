@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flashcards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1>📘 Flashcards</h1>
+
+      <div class="controls">
+        <input id="search" type="text" placeholder="Search terms...">
+        <button id="addBtn">+ Add</button>
+      </div>
+
+      <div class="controls">
+        <button id="importBtn">Import</button>
+        <button id="exportBtn">Export</button>
+        <button id="randomBtn">🎲 Random</button>
+        <input type="file" id="fileInput" accept="application/json" style="display:none">
+      </div>
+
+      <ul id="terms"></ul>
+    </aside>
+
+    <!-- Main Flashcard -->
+    <main class="main">
+      <div class="card" id="card">
+        <div class="term" id="termText">Select a term</div>
+        <div class="definition" id="definitionText"></div>
+        <button id="revealBtn">Reveal Definition</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for Add/Edit -->
+  <div class="modal hidden" id="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Add Flashcard</h2>
+      <input id="modalTerm" type="text" placeholder="Term">
+      <textarea id="modalDef" placeholder="Definition"></textarea>
+      <div class="modal-actions">
+        <button id="saveBtn">Save</button>
+        <button id="cancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for JSON Import/Export -->
+  <div class="modal hidden" id="jsonModal">
+    <div class="modal-content">
+      <h2 id="jsonTitle">JSON Editor</h2>
+      <textarea id="jsonArea" style="height:200px"></textarea>
+      <div class="modal-actions">
+        <button id="jsonDownloadBtn" class="hidden">Download</button>
+        <button id="jsonUploadBtn" class="hidden">Upload</button>
+        <button id="jsonApplyBtn" class="hidden">Apply</button>
+        <button id="jsonCloseBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
