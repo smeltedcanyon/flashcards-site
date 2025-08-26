@@ -1,216 +1,200 @@
+// Elements
 const termsList = document.getElementById("terms");
 const termText = document.getElementById("termText");
-const defText = document.getElementById("definitionText");
+const definitionText = document.getElementById("definitionText");
 const revealBtn = document.getElementById("revealBtn");
 const searchInput = document.getElementById("search");
-
+const addBtn = document.getElementById("addBtn");
+const randomBtn = document.getElementById("randomBtn");
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modalTitle");
-const modalTerm = document.getElementById("modalTerm");
-const modalDef = document.getElementById("modalDef");
-const saveBtn = document.getElementById("saveBtn");
+const termInput = document.getElementById("termInput");
+const defInput = document.getElementById("defInput");
+const saveCardBtn = document.getElementById("saveCardBtn");
 const cancelBtn = document.getElementById("cancelBtn");
-const addBtn = document.getElementById("addBtn");
-
+const ioModal = document.getElementById("ioModal");
+const ioTitle = document.getElementById("ioTitle");
+const jsonArea = document.getElementById("jsonArea");
+const ioDownload = document.getElementById("ioDownload");
+const ioUpload = document.getElementById("ioUpload");
+const ioClose = document.getElementById("ioClose");
 const importBtn = document.getElementById("importBtn");
 const exportBtn = document.getElementById("exportBtn");
-const randomBtn = document.getElementById("randomBtn");
-const fileInput = document.getElementById("fileInput");
+const showDefinitionOnly = document.getElementById("showDefinitionOnly");
+const cardEl = document.getElementById("card");
 
-const jsonModal = document.getElementById("jsonModal");
-const jsonTitle = document.getElementById("jsonTitle");
-const jsonArea = document.getElementById("jsonArea");
-const jsonApplyBtn = document.getElementById("jsonApplyBtn");
-const jsonCloseBtn = document.getElementById("jsonCloseBtn");
-const jsonDownloadBtn = document.getElementById("jsonDownloadBtn");
-const jsonUploadBtn = document.getElementById("jsonUploadBtn");
-
+// State
 let cards = JSON.parse(localStorage.getItem("flashcards") || "[]");
-let selected = null;
-let editing = null;
-let mode = null; // "import" or "export"
+let currentIndex = null;
+let editingIndex = null;
 
+// Init
+renderList();
+renderCard(null);
+
+// Save cards
 function saveCards() {
   localStorage.setItem("flashcards", JSON.stringify(cards));
 }
 
+// Render list
 function renderList(filter = "") {
   termsList.innerHTML = "";
-  cards
-    .filter(c => c.term.toLowerCase().includes(filter.toLowerCase()))
-    .forEach(c => {
-      const li = document.createElement("li");
+  cards.forEach((c, i) => {
+    if (!c.term.toLowerCase().includes(filter.toLowerCase())) return;
+    const li = document.createElement("li");
+    li.textContent = c.term;
+    if (i === currentIndex) li.classList.add("active");
 
-      const span = document.createElement("span");
-      span.textContent = c.term;
-      span.style.flex = "1";
-      span.onclick = () => selectCard(c);
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "✕";
+    delBtn.className = "delete-btn";
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      cards.splice(i, 1);
+      saveCards();
+      if (currentIndex === i) currentIndex = null;
+      renderList(searchInput.value);
+      renderCard(currentIndex);
+    };
 
-      const delBtn = document.createElement("button");
-      delBtn.textContent = "✕";
-      delBtn.className = "delete-btn";
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        deleteCard(c);
-      };
+    li.appendChild(delBtn);
+    li.onclick = () => {
+      currentIndex = i;
+      renderList(searchInput.value);
+      renderCard(i);
+    };
 
-      li.appendChild(span);
-      li.appendChild(delBtn);
-
-      li.className = c === selected ? "active" : "";
-      termsList.appendChild(li);
-    });
+    termsList.appendChild(li);
+  });
 }
 
-function selectCard(card) {
-  selected = card;
-  termText.textContent = card.term;
-  defText.textContent = card.definition;
-  document.getElementById("card").classList.remove("revealed");
-  renderList(searchInput.value);
-}
-
-function deleteCard(card) {
-  if (!confirm(`Delete flashcard: "${card.term}"?`)) return;
-  cards = cards.filter(c => c !== card);
-  if (selected === card) {
-    selected = null;
+// Render card (swaps roles if definition-first mode)
+function renderCard(index) {
+  if (index === null || index < 0 || index >= cards.length) {
     termText.textContent = "Select a term";
-    defText.textContent = "";
-    document.getElementById("card").classList.remove("revealed");
+    definitionText.textContent = "";
+    return;
   }
-  saveCards();
-  renderList(searchInput.value);
+
+  const card = cards[index];
+  const defOnly = showDefinitionOnly.checked;
+
+  if (defOnly) {
+    // Swap → definition shown first
+    termText.textContent = card.definition;
+    definitionText.textContent = "";
+  } else {
+    // Normal
+    termText.textContent = card.term;
+    definitionText.textContent = "";
+  }
 }
 
+// Reveal button
 revealBtn.onclick = () => {
-  if (!selected) return;
-  document.getElementById("card").classList.toggle("revealed");
+  if (currentIndex === null) return;
+  const card = cards[currentIndex];
+  const defOnly = showDefinitionOnly.checked;
+
+  if (defOnly) {
+    definitionText.textContent = card.term; // reveal term
+  } else {
+    definitionText.textContent = card.definition; // reveal definition
+  }
 };
 
-searchInput.oninput = () => renderList(searchInput.value);
-
+// Add
 addBtn.onclick = () => {
-  editing = null;
+  editingIndex = null;
   modalTitle.textContent = "Add Flashcard";
-  modalTerm.value = "";
-  modalDef.value = "";
+  termInput.value = "";
+  defInput.value = "";
   modal.classList.remove("hidden");
 };
 
-cancelBtn.onclick = () => modal.classList.add("hidden");
-
-saveBtn.onclick = () => {
-  const term = modalTerm.value.trim();
-  const def = modalDef.value.trim();
+// Save card
+saveCardBtn.onclick = () => {
+  const term = termInput.value.trim();
+  const def = defInput.value.trim();
   if (!term || !def) return;
-  if (editing) {
-    editing.term = term;
-    editing.definition = def;
+
+  if (editingIndex !== null) {
+    cards[editingIndex] = { term, definition: def };
   } else {
     cards.push({ term, definition: def });
   }
+
   saveCards();
-  renderList();
+  renderList(searchInput.value);
   modal.classList.add("hidden");
 };
 
-// ===== RANDOM =====
+// Cancel modal
+cancelBtn.onclick = () => modal.classList.add("hidden");
+
+// Search
+searchInput.oninput = () => {
+  renderList(searchInput.value);
+};
+
+// Random
 randomBtn.onclick = () => {
-  if (cards.length === 0) return alert("No cards available!");
-  const randomCard = cards[Math.floor(Math.random() * cards.length)];
-  selectCard(randomCard);
+  if (cards.length === 0) return;
+  currentIndex = Math.floor(Math.random() * cards.length);
+  renderList(searchInput.value);
+  renderCard(currentIndex);
 };
 
-// ===== EXPORT =====
+// Import / Export
+importBtn.onclick = () => {
+  ioTitle.textContent = "Import Flashcards";
+  jsonArea.value = "";
+  ioModal.classList.remove("hidden");
+};
+
 exportBtn.onclick = () => {
-  mode = "export";
-  jsonTitle.textContent = "Export JSON";
+  ioTitle.textContent = "Export Flashcards";
   jsonArea.value = JSON.stringify(cards, null, 2);
-  jsonDownloadBtn.classList.remove("hidden");
-  jsonUploadBtn.classList.add("hidden");
-  jsonApplyBtn.classList.add("hidden");
-  jsonModal.classList.remove("hidden");
+  ioModal.classList.remove("hidden");
 };
 
-jsonDownloadBtn.onclick = () => {
-  const dataStr = JSON.stringify(cards, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
+ioClose.onclick = () => ioModal.classList.add("hidden");
+
+ioDownload.onclick = () => {
+  const blob = new Blob([jsonArea.value], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = "flashcards.json";
-  document.body.appendChild(a);
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
 
-// ===== IMPORT =====
-importBtn.onclick = () => {
-  mode = "import";
-  jsonTitle.textContent = "Import JSON";
-  jsonArea.value = "";
-  jsonDownloadBtn.classList.add("hidden");
-  jsonUploadBtn.classList.remove("hidden");
-  jsonApplyBtn.classList.remove("hidden");
-  jsonModal.classList.remove("hidden");
-};
-
-jsonUploadBtn.onclick = () => {
-  fileInput.click();
-};
-
-fileInput.onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    try {
-      const imported = JSON.parse(ev.target.result);
-      applyImport(imported);
-    } catch {
-      alert("Failed to parse JSON file.");
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = "";
-};
-
-jsonApplyBtn.onclick = () => {
+ioUpload.onclick = () => {
   try {
     const imported = JSON.parse(jsonArea.value);
-    applyImport(imported);
-    jsonModal.classList.add("hidden");
-  } catch {
-    alert("Invalid JSON format.");
+    if (Array.isArray(imported)) {
+      cards = imported;
+      saveCards();
+      renderList(searchInput.value);
+      renderCard(null);
+      ioModal.classList.add("hidden");
+    } else {
+      alert("Invalid JSON format");
+    }
+  } catch (e) {
+    alert("Invalid JSON");
   }
 };
 
-jsonCloseBtn.onclick = () => jsonModal.classList.add("hidden");
-
-function applyImport(imported) {
-  if (!Array.isArray(imported)) {
-    alert("Invalid JSON format.");
-    return;
-  }
-  if (confirm("Replace existing cards with imported deck? Click Cancel to merge.")) {
-    cards = imported;
-  } else {
-    cards = [...cards, ...imported];
-  }
-  saveCards();
-  renderList();
+// Load preference
+if (localStorage.getItem("showDefinitionOnly") === "true") {
+  showDefinitionOnly.checked = true;
 }
 
-// Load starter deck if empty
-if (cards.length === 0) {
-  cards = [
-    { term: "Photosynthesis", definition: "Process plants use to turn sunlight into energy." },
-    { term: "Mitosis", definition: "Cell division resulting in two identical daughter cells." },
-    { term: "Ecosystem", definition: "Community of living organisms and their environment." },
-  ];
-  saveCards();
-}
-
-renderList();
+// Toggle preference
+showDefinitionOnly.addEventListener("change", () => {
+  localStorage.setItem("showDefinitionOnly", showDefinitionOnly.checked);
+  renderCard(currentIndex);
+});

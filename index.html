@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flashcards</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -10,56 +10,58 @@
   <div class="app">
     <!-- Sidebar -->
     <aside class="sidebar">
-      <h1>📘 Flashcards</h1>
-
-      <div class="controls">
-        <input id="search" type="text" placeholder="Search terms...">
-        <button id="addBtn">+ Add</button>
-      </div>
-
-      <div class="controls">
-        <button id="importBtn">Import</button>
-        <button id="exportBtn">Export</button>
-        <button id="randomBtn">🎲 Random</button>
-        <input type="file" id="fileInput" accept="application/json" style="display:none">
-      </div>
+      <h1>Flashcards</h1>
+      <input type="text" id="search" placeholder="Search terms...">
 
       <ul id="terms"></ul>
+
+      <div class="controls">
+        <button id="addBtn">➕ Add</button>
+        <button id="randomBtn">🎲 Random</button>
+        <button id="importBtn">📥 Import</button>
+        <button id="exportBtn">📤 Export</button>
+      </div>
+
+      <div class="settings">
+        <label class="toggle">
+          <input type="checkbox" id="showDefinitionOnly">
+          Show definitions first
+        </label>
+      </div>
     </aside>
 
-    <!-- Main Flashcard -->
+    <!-- Main content -->
     <main class="main">
       <div class="card" id="card">
-        <div class="term" id="termText">Select a term</div>
-        <div class="definition" id="definitionText"></div>
-        <button id="revealBtn">Reveal Definition</button>
+        <div id="termText" class="term"></div>
+        <div id="definitionText" class="definition"></div>
       </div>
+      <button id="revealBtn" class="reveal">Reveal</button>
     </main>
   </div>
 
-  <!-- Modal for Add/Edit -->
-  <div class="modal hidden" id="modal">
+  <!-- Add/Edit Modal -->
+  <div id="modal" class="modal hidden">
     <div class="modal-content">
       <h2 id="modalTitle">Add Flashcard</h2>
-      <input id="modalTerm" type="text" placeholder="Term">
-      <textarea id="modalDef" placeholder="Definition"></textarea>
+      <input id="termInput" placeholder="Term">
+      <textarea id="defInput" placeholder="Definition"></textarea>
       <div class="modal-actions">
-        <button id="saveBtn">Save</button>
-        <button id="cancelBtn">Cancel</button>
+        <button id="saveCardBtn">Save</button>
+        <button id="cancelBtn" class="cancel">Cancel</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal for JSON Import/Export -->
-  <div class="modal hidden" id="jsonModal">
+  <!-- Import/Export Modal -->
+  <div id="ioModal" class="modal hidden">
     <div class="modal-content">
-      <h2 id="jsonTitle">JSON Editor</h2>
-      <textarea id="jsonArea" style="height:200px"></textarea>
+      <h2 id="ioTitle">Import / Export</h2>
+      <textarea id="jsonArea" placeholder="Paste JSON here..."></textarea>
       <div class="modal-actions">
-        <button id="jsonDownloadBtn" class="hidden">Download</button>
-        <button id="jsonUploadBtn" class="hidden">Upload</button>
-        <button id="jsonApplyBtn" class="hidden">Apply</button>
-        <button id="jsonCloseBtn">Close</button>
+        <button id="ioDownload">Download</button>
+        <button id="ioUpload">Upload</button>
+        <button id="ioClose" class="cancel">Close</button>
       </div>
     </div>
   </div>
