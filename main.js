@@ -21,7 +21,6 @@ const ioClose = document.getElementById("ioClose");
 const importBtn = document.getElementById("importBtn");
 const exportBtn = document.getElementById("exportBtn");
 const showDefinitionOnly = document.getElementById("showDefinitionOnly");
-const cardEl = document.getElementById("card");
 
 // State
 let cards = JSON.parse(localStorage.getItem("flashcards") || "[]");
@@ -69,7 +68,7 @@ function renderList(filter = "") {
   });
 }
 
-// Render card (swaps roles if definition-first mode)
+// Render card
 function renderCard(index) {
   if (index === null || index < 0 || index >= cards.length) {
     termText.textContent = "Select a term";
@@ -81,11 +80,9 @@ function renderCard(index) {
   const defOnly = showDefinitionOnly.checked;
 
   if (defOnly) {
-    // Swap → definition shown first
     termText.textContent = card.definition;
     definitionText.textContent = "";
   } else {
-    // Normal
     termText.textContent = card.term;
     definitionText.textContent = "";
   }
@@ -98,9 +95,9 @@ revealBtn.onclick = () => {
   const defOnly = showDefinitionOnly.checked;
 
   if (defOnly) {
-    definitionText.textContent = card.term; // reveal term
+    definitionText.textContent = card.term;
   } else {
-    definitionText.textContent = card.definition; // reveal definition
+    definitionText.textContent = card.definition;
   }
 };
 
@@ -150,12 +147,16 @@ randomBtn.onclick = () => {
 importBtn.onclick = () => {
   ioTitle.textContent = "Import Flashcards";
   jsonArea.value = "";
+  ioUpload.classList.remove("hidden");
+  ioDownload.classList.add("hidden");
   ioModal.classList.remove("hidden");
 };
 
 exportBtn.onclick = () => {
   ioTitle.textContent = "Export Flashcards";
   jsonArea.value = JSON.stringify(cards, null, 2);
+  ioDownload.classList.remove("hidden");
+  ioUpload.classList.add("hidden");
   ioModal.classList.remove("hidden");
 };
 
